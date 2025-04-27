@@ -1,0 +1,8 @@
+{
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format" // 指定C++文件的默认格式化工具
+    },
+    "editor.formatOnSave": true,
+    "clang-format.executable": "C:/msys64/ucrt64/bin/clang-format.exe",
+    "clang-format.style": "file",  // 使用项目根目录的.clang-format文件
+}

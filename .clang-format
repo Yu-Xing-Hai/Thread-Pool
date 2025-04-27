@@ -1,0 +1,13 @@
+# .clang-format（线程池项目优化版）
+BasedOnStyle: LLVM  # 保持您现有的高效风格
+IndentWidth: 4      # 与您代码习惯一致
+TabWidth: 4
+UseTab: Never
+# 以下是新增的"美学增强"参数：
+ColumnLimit: 100     # 适当放宽行宽限制（默认80太严格）
+BreakBeforeBraces: Custom  # 精细控制大括号
+BraceWrapping:
+  AfterClass: false   # 类定义后换行
+  AfterFunction: false # 函数定义后换行
+  AfterControlStatement: Never  # if/for等语句不换行
+PointerAlignment: Left  # 保持您的 int* a 风格

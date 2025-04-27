@@ -1,0 +1,6 @@
+CompileFlags:
+  Add: [-I./codes/KernelModuleDesign/include, -std=c++17]
+Index:
+  Background: Skip
+Hover:
+  ShowAKA: Yes

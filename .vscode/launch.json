@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "-enable-pretty-printing -debugger-multi-thread",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "显示完整调用栈",
+                    "text": "set print frame-arguments all"
+                }
+                {
+                    "description": "跳过STL源码",
+                    "text": "skip -gfi C:/msys64/ucrt64/include/c++/14.2.0/bits/*"
+                }
+            ],
+            "preLaunchTask": "C++ Compile",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/msys64/ucrt64/include/**",
+                "${workspaceFolder}/codes/KernelModuleDesign/include/**"
+            ],
+            "compilerPath": "C:/msys64/ucrt64/bin/g++.exe"
+        }
+    ]
+}
