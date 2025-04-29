@@ -1,16 +1,13 @@
 // #ifndef INCLUDE_TASKSQUEUE_H
-// //防止头文件之间相互包含导致的无限递归，如果未定义该宏，则编译以下内容 #define
-// INCLUDE_TASKSQUEUE_H  // 定义宏标记
+// //防止头文件之间相互包含导致的无限递归，如果未定义该宏，则编译以下内容
+// #define INCLUDE_TASKSQUEUE_H  // 定义宏标记
 #pragma once // 编译器特性，效果相同但无需手动定义宏
 
 /*
 [第二版]C++线程池实现
 当前目标：
 1. 实现有界任务队列 【√】
-2. 实现异常处理
 
-后续规划
-1. 除非性能测试证明锁竞争是瓶颈时，采用双互斥锁
 */
 #include <atomic>
 #include <condition_variable> //线程同步工具，用于阻塞或唤醒线程
@@ -36,18 +33,22 @@ class TasksQueue {
         cv_producer.wait(lock, [this]() {
             return tasks.size() <= MAX_QUEUE_SIZE;
         }); // 限制任务队列容量，wait函数第二个参数为true时才可向下执行，否则释放锁并阻塞当前线程
-        tasks.push(
-            std::move(task));     // 任务入队,move函数用于转移函数对象持有者，避免函数对象的拷贝开销
+        try {
+            tasks.push(std::move(task));
+        } catch (const std::exception& e) {
+            std::cerr << "Fail to push:" << e.what() << std::endl;
+            throw;  //通知函数调用方发生的错误，明晰责任链
+        }
         cv_consumer.notify_one(); // 唤醒一个消费者线程
     };
 
     std::function<void()> Pop() {
         std::unique_lock<std::mutex> lock(mtx); // 消费者获取进入任务队列的锁
         cv_consumer.wait(lock, [this]() {
-            return !tasks.empty() ||
-                   stop_flag
-                       .load(); // 在Pop中使用stop_flag，可确保当想要结束所有线程且tasks为空时，线程不会被二次阻塞进而导致资源释放异常
-        });                     // 如果任务队列为空，则阻塞当前进程并自动释放锁
+            // 如果任务队列为空且stop_flag为false，则阻塞当前进程并自动释放锁
+            // 在Pop中使用stop_flag，可确保当想要结束所有线程且tasks为空时，线程不会被二次阻塞进而导致资源释放异常
+            return !tasks.empty() || stop_flag.load();
+        });
         if (stop_flag.load() == true)
             return nullptr;
         std::function<void()> task = std::move(tasks.front());

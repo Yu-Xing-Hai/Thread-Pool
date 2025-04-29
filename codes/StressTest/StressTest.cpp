@@ -1,8 +1,7 @@
-#include "TasksQueue.h"
-#include "ThreadPool.h"
-#include <iostream>
+/*
+压力测试代码说明
 
-// 压力测试示例
+*/
 void StressTest() {
     /*测试初始化*/
     ThreadPool pool(std::thread::hardware_concurrency()); // 创建线程池，线程数等于CPU核心数
@@ -19,12 +18,4 @@ void StressTest() {
         std::this_thread::yield();  //主线程让出CPU时间片，避免忙等待消耗CPU
     std::cout << "压力测试通过" << std::endl;
     std::cout << counter.load() << std::endl;
-}
-
-int main() {
-    StressTest();
-
-    // 主线程执行其他操作
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    return 0;
 }
