@@ -5,10 +5,10 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+            "program": "E:/MarkdownNoteBook/YuXingHaiJourney/ComputerScience/Projects/CppProjects/Thread_Pool/codes/KernelModuleDesign/build/main.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/codes/KernelModuleDesign/build",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
@@ -32,7 +32,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/msys64/ucrt64/include/**",
-                "${workspaceFolder}/codes/KernelModuleDesign/include/**"
+                "${workspaceFolder}/codes/KernelModuleDesign/include",
             ],
             "compilerPath": "C:/msys64/ucrt64/bin/g++.exe"
         }

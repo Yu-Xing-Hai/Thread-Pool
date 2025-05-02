@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/msys64/ucrt64/include/**",
-                "${workspaceFolder}/codes/KernelModuleDesign/include/**"
+                "${workspaceFolder}/codes/KernelModuleDesign/include"
             ],
             "defines": [],
             "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
