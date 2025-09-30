@@ -5,7 +5,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "E:/MarkdownNoteBook/YuXingHaiJourney/ComputerScience/Projects/CppProjects/Thread_Pool/codes/KernelModuleDesign/build/main.exe",
+            "program":"E:/MarkdownNoteBook/YuXingHaiJourney/ComputerScience/Projects/CppProjects/Thread_Pool/codes/KernelModuleDesign/build/main.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/codes/KernelModuleDesign/build",
