@@ -1,6 +1,7 @@
 #include "StressTest.h"
 #include "TasksQueue.h"
 #include "ThreadPool.h"
+#include <iostream>
 /*
 压力测试代码说明
 
@@ -22,4 +23,9 @@ void StressTest() {
         std::this_thread::yield();  //主线程让出CPU时间片，避免忙等待消耗CPU
     std::cout << "压力测试通过" << std::endl;
     std::cout << counter.load() << std::endl;
+}
+
+int main() {
+    StressTest();
+    return 0;
 }

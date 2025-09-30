@@ -26,10 +26,12 @@ class TasksQueue {
     std::condition_variable cv_consumer;     // 消费者条件变量
     std::atomic<bool> stop_flag;             // 创建原子布尔值，不可直接初始化
   public:
-    TasksQueue() : stop_flag(false) {} // 构造函数
+    TasksQueue() : stop_flag(false) {} // 构造函数，同时初始化stop_flag变量
 
     void Push(std::function<void()> task) {
-        std::unique_lock<std::mutex> lock(mtx); // 生产者获取进入任务队列的锁
+        if (stop_flag.load() == true)
+            throw std::runtime_error("ThreadPool已关闭");
+        std::unique_lock<std::mutex> lock(mtx); // 生产者获取到访问任务队列的锁
         cv_producer.wait(lock, [this]() {
             return tasks.size() <= MAX_QUEUE_SIZE;
         }); // 限制任务队列容量，wait函数第二个参数为true时才可向下执行，否则释放锁并阻塞当前线程
@@ -37,7 +39,7 @@ class TasksQueue {
             tasks.push(std::move(task));
         } catch (const std::exception& e) {
             std::cerr << "Fail to push:" << e.what() << std::endl;
-            throw;  //通知函数调用方发生的错误，明晰责任链
+            throw; // 通知函数调用方发生的错误，明晰责任链
         }
         cv_consumer.notify_one(); // 唤醒一个消费者线程
     };
@@ -55,7 +57,7 @@ class TasksQueue {
         tasks.pop();
         cv_producer.notify_one(); // 唤醒一个生产者
         return task;
-        /*std::unique_lock<std::mutex>遵从RAII规则，离开作用域后自动调用析构函数释放lock*/
+        /*std::unique_lock<std::mutex>遵从RAII规则，离开Pop函数作用域后自动调用析构函数释放lock*/
     };
     void Stop() {
         stop_flag.store(true);

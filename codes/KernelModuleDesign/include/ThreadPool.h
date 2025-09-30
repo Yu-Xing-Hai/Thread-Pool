@@ -26,7 +26,7 @@
 class ThreadPool {
   private:
     TasksQueue tasks_queue;           // 实例化任务队列
-    std::vector<std::thread> workers; // 可复用工作线程
+    std::vector<std::thread> workers; // 可复用工作线程（消费者线程）
     std::atomic<bool> stop_flag;      // 创建原子布尔值，不可直接初始化
 
   public:
@@ -36,7 +36,7 @@ class ThreadPool {
         size_t：无符号整数类型，用于表示对象大小或数组索引
     */
     explicit ThreadPool(size_t thread_num) : stop_flag(false) { // 在构造函数中初始化stop_flag
-        for (size_t i = 0; i < thread_num; i++) {
+        for (size_t i = 0; i < thread_num; i++) {  // 构造用户指定数量的工作线程
             try {
                 workers.emplace_back([this] {
                     while (!stop_flag.load()) {
@@ -51,7 +51,7 @@ class ThreadPool {
                             }
                         }
                         else
-                            continue;  //防御空任务
+                            continue;  //预防空任务
                     }
                 });
             } catch (const std::exception& e) {
@@ -79,7 +79,7 @@ class ThreadPool {
         for (auto& worker : workers) {
             try {
                 if (worker.joinable())
-                worker.join(); // 阻塞主线程，释放worker线程占有的资源，再进行析构便不会造成内存泄漏
+                worker.join(); // 先阻塞主线程，待释放完worker线程占有的资源，再进行析构便不会造成内存泄漏
             } catch (const std::exception& e) {
                 std::cerr << "Thread merge error:" << e.what() << std::endl;
             }
