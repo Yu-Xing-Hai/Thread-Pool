@@ -15,11 +15,12 @@
      - 析构函数中的异常处理【√】
        - worker.join()时若任务抛出异常，会导致析构函数传播异常
      - 资源泄露风险【√】
-   - 支持任务返回值
+   - 支持任务返回值【√】
      - 使用`<future>`库完成异步任务结果的获取
    - 日志记录的可配置性
 
 2. **进阶优化**
+   - 实现无锁队列【√】
    - 实现动态扩容：根据队列负载自动增减线程
    - 集成性能监控：统计任务平均耗时/队列积压量  
    - 添加优雅退出机制：处理未完成任务【√】
@@ -52,11 +53,12 @@
 - 条件变量Condition_virable
 - 原子变量atomic
   - 用于管理线程池状态，如`stop_flag`可被用于控制工作线程组是否停止工作
-# 五、当前测试结果
-- 对照线程池：BS：：threadpool
+# 五、测试结果汇总
+- 对照成熟线程池：BS：：threadpool
   - github：https://github.com/bshoshany/thread-pool.git
 - 对照测试结果
-```TEST
+```TEXT
+#*********************基于queue的线程池测试结果*********************
 $ ./benchmark_compare.exe
 Starting thread pool performance comparison test...
 
@@ -74,6 +76,28 @@ My thread pool:    483 us (0.483 ms) (Result: 171876)
 Number of tasks: 10, Complexity: 10000
 BS::thread_pool: 557 us (0.557 ms) (Result: 142441)
 My thread pool:    588 us (0.588 ms) (Result: 142441)
+
+Test completed!
+```
+
+```TEXT
+#*********************基于无锁队列的线程池测试结果*********************
+Starting thread pool performance comparison test...
+
+=== Light task test ===
+Number of tasks: 1000, Complexity: 100
+BS::thread_pool: 2898 us (2.898 ms) (Result: 138460)
+My thread pool:    992 us (0.992 ms) (Result: 138460)
+
+=== Medium task test ===
+Number of tasks: 100, Complexity: 1000
+BS::thread_pool: 661 us (0.661 ms) (Result: 171876)
+My thread pool:    698 us (0.698 ms) (Result: 171876)
+
+=== Heavy task test ===
+Number of tasks: 10, Complexity: 10000
+BS::thread_pool: 735 us (0.735 ms) (Result: 142441)
+My thread pool:    729 us (0.729 ms) (Result: 142441)
 
 Test completed!
 ```
