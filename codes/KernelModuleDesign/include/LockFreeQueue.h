@@ -108,4 +108,4 @@ template <typename T> class LockFreeQueue {
         // 队列为空的条件：头指针和尾指针指向同一个节点，且该节点的next指针为空
         return (head == tail) && (head->next == nullptr);
     }
-}
+};
