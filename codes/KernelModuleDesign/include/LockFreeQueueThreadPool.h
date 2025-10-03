@@ -88,6 +88,7 @@ class LockFreeQueueThreadPool {
         using return_type = typename std::result_of<F(Args...)>::type;
 
         // 使用package_task包装任务
+        // 即使 shared_ptr 引用计数归 0，packaged_task 也不会立即被销毁，因为 future 会通过内部机制 “延长” 关键数据的生命周期
         auto task = std::make_shared<std::packaged_task<return_type()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
