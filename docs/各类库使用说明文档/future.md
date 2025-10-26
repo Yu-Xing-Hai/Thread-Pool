@@ -1,16 +1,11 @@
 ### 概述
 理解`future`机制其实很简单，我们可以从“**如何获取异步任务的结果**”这个核心问题出发，一步步梳理清楚。
-
-
 ### 一、为什么需要future机制？
 假设你有一个耗时任务（比如下载文件、计算大数据），你不想让它阻塞主线程，于是把它放到线程池里异步执行。这时问题来了：
 - 任务在后台执行，什么时候能完成？
 - 任务的返回结果怎么拿到？
 - 如果任务执行出错了，怎么捕获异常？
-
 `future`机制就是为解决这些问题而生的——它像一个“**未来的结果凭证**”，让你能在任务提交后，通过这个凭证去获取结果、等待完成，或者处理异常。
-
-
 ### 二、future机制的核心组件
 C++的`future`机制主要涉及3个核心类，它们分工明确：
 
@@ -21,8 +16,6 @@ C++的`future`机制主要涉及3个核心类，它们分工明确：
 | `std::promise<T>`  | 用于**手动设置结果**（更底层，线程池场景中较少直接使用）             |
 
 线程池场景中，最常用的是前两个：用`packaged_task`包装任务，用`future`拿结果。
-
-
 ### 三、future机制的工作流程（类比生活场景）
 用一个生活例子理解：
 
@@ -54,7 +47,7 @@ int score = result.get(); // 阻塞到任务完成，返回结果
 ```
 
 
-### 四、future的核心用法（小白必记）
+### 四、future的核心用法
 #### 1. 获取结果：`get()`
 这是`future`最核心的方法，用于获取任务的返回值：
 ```cpp
@@ -65,7 +58,7 @@ int value = fut.get(); // 阻塞等待任务完成，返回结果
 - 如果任务没有返回值（`T=void`），`get()`也会阻塞等待任务完成，但不返回值。
 
 #### 2. 等待完成：`wait()`
-如果只想等任务完成，不需要结果（或结果通过其他方式处理），用`wait()`：
+如果只想等任务完成，**不需要结果**（或结果通过其他方式处理），用`wait()`：
 ```cpp
 fut.wait(); // 阻塞到任务完成，不返回值
 ```
@@ -82,50 +75,15 @@ if (status == std::future_status::ready) {
     // 超时未完成
 }
 ```
-
-
 ### 五、线程池如何集成future机制？
 线程池的`submit`方法需要做到：
 1. 接收用户提交的任务（函数、lambda等）。
 2. 用`packaged_task`包装任务，生成`future`。
 3. 把包装后的任务放进任务队列（让工作线程执行）。
 4. 返回`future`给用户，让用户后续获取结果。
-
-简化的核心代码（就是我们之前实现的逻辑）：
-```cpp
-// 提交任务的函数
-template <typename F>
-auto submit(F&& task) -> std::future<decltype(task())> {
-    // 1. 包装任务
-    using return_type = decltype(task()); // 推导任务返回类型
-    auto packaged = std::make_shared<std::packaged_task<return_type()>>(std::forward<F>(task));
-    
-    // 2. 生成future
-    std::future<return_type> result = packaged->get_future();
-    
-    // 3. 任务入队（工作线程会执行packaged->operator()()）
-    task_queue.enqueue([packaged]() { (*packaged)(); });
-    
-    // 4. 返回future
-    return result;
-}
-```
-
-用户使用时，只需提交任务并拿到`future`：
-```cpp
-// 提交一个有返回值的任务
-auto fut = thread_pool.submit([](){ 
-    return "任务完成！"; 
-});
-
-// 后续获取结果
-std::cout << fut.get() << std::endl;
-```
-
-
-### 六、常见误区（小白避坑）
+### 六、常见误区
 1. **不要忽略异常**：  
-   如果任务执行中抛了异常，`get()`会重新抛出这个异常，必须用`try-catch`处理：
+   - 如果任务执行中抛了异常，`get()`会重新抛出这个异常，必须用`try-catch`处理：
    ```cpp
    try {
        fut.get();
@@ -135,11 +93,10 @@ std::cout << fut.get() << std::endl;
    ```
 
 2. **`future`不是线程安全的**：  
-   同一个`future`不能被多个线程同时调用`get()`或`wait()`，会导致未定义行为。
+   - 同一个`future`不能被多个线程同时调用`get()`或`wait()`，会导致未定义行为。
 
 3. **`packaged_task`需要移动语义**：  
-   `packaged_task`不能复制，只能移动（因为它绑定了唯一的任务和结果），所以提交任务时要用`std::move`。
-
+   - `packaged_task`不能复制，只能移动（因为它绑定了唯一的任务和结果），所以提交任务时要用`std::move`。
 
 ### 总结
 future机制的核心就是“**异步任务的结果凭证**”：
