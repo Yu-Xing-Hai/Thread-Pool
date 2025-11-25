@@ -87,12 +87,12 @@ template <typename T> class LockFreeQueue {
                 result = next_node->data;
                 // 移动头指针
                 if (head_.compare_exchange_weak(old_head, next_node)) {
+                    // 释放旧的头节点
+                    delete old_head;
                     break; // 成功出队，跳出循环
                 }
             }
         }
-        // 释放旧的头节点
-        delete old_head;
         return true;
     }
 
